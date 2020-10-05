@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Redirect } from "react-router-dom";
-import { Badge, FormFeedback } from "reactstrap";
+import { Badge } from "reactstrap";
 
 const InfoSerie = ({ match }) => {
   const [form, setForm] = useState({});
   const [success, setSuccess] = useState(false);
   const [mode, setMode] = useState("INFO");
+  const [genres, setGenres] = useState([]);
   const [data, setData] = useState({});
 
   useEffect(() => {
@@ -16,6 +17,12 @@ const InfoSerie = ({ match }) => {
       setForm(res.data);
     });
   }, [match.params.id]);
+
+  useEffect(() => {
+    axios.get("/api/genres").then((res) => {
+      setGenres(res.data.data);
+    });
+  }, []);
 
   const masterHeader = {
     height: "50vh",
@@ -33,14 +40,17 @@ const InfoSerie = ({ match }) => {
     });
   };
 
+  const selectStatus = (value) => () => {
+    setForm({
+      ...form,
+      status: value,
+    });
+  };
+
   const saveSerie = () => {
-    axios
-      .post("/api/series", {
-        form,
-      })
-      .then((res) => {
-        setSuccess(true);
-      });
+    axios.put(`/api/series/${match.params.id}`, form).then((res) => {
+      setSuccess(true);
+    });
   };
 
   if (success) {
@@ -79,7 +89,8 @@ const InfoSerie = ({ match }) => {
       </div>
       {mode === "EDIT" && (
         <div className="container">
-          <h1>Nova Serie</h1>
+          <h1>Editar</h1>
+          {JSON.stringify(form)}
           <button onClick={() => setMode("INFO")} className="btn btn-primary">
             Cancelar edicao
           </button>
@@ -94,6 +105,8 @@ const InfoSerie = ({ match }) => {
                 value={form.name}
                 onChange={onChange("name")}
               />
+            </div>
+            <div className="form-group">
               <label htmlFor="name">Comentarios</label>
               <input
                 className="form-control"
@@ -104,12 +117,53 @@ const InfoSerie = ({ match }) => {
                 onChange={onChange("comments")}
               />
             </div>
+            <div className="form-group">
+              <label htmlFor="name">Generos</label>
+              <select className="form-control" onChange={onChange("genre_id")}>
+                {genres.map((genre) => (
+                  <option
+                    key={genre.id}
+                    value={genre.id}
+                    selected={genre.id === form.genre}
+                  >
+                    {genre.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="form-check">
+              <input
+                type="radio"
+                className="form-check-input"
+                name="status"
+                id="assistido"
+                value="ASSISTIDO"
+                onClick={selectStatus("ASSISTIDO")}
+              />
+              <label htmlFor="assistido" className="form-check-label">
+                Assistido
+              </label>
+            </div>
+            <div className="form-check">
+              <input
+                type="radio"
+                className="form-check-input"
+                name="status"
+                id="paraAssistir"
+                value="PARA_ASSISTIR"
+                onClick={selectStatus("PARA_ASSISTIR")}
+              />
+              <label htmlFor="paraAssistir" className="form-check-label">
+                Para assistir
+              </label>
+            </div>
+
             <button
               type="button"
               onClick={saveSerie}
               className="btn btn-primary"
             >
-              Adicionar
+              Salvar
             </button>
           </form>
         </div>
