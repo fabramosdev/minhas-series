@@ -8,14 +8,11 @@ import Home from "./pages/Home";
 import Genres from "./pages/Genres";
 import NewGenre from "./pages/NewGenre";
 import EditGenre from "./pages/EditGenre";
+import Series from "./pages/Series";
+import NewSerie from "./pages/NewSerie";
+import InfoSerie from "./pages/InfoSerie";
 
 function App() {
-  const [data, setData] = useState({});
-  useEffect(() => {
-    axios.get("/api").then((res) => {
-      setData(res.data);
-    });
-  }, []);
   return (
     <Router>
       <div>
@@ -25,6 +22,9 @@ function App() {
           <Route exact path="/genres" component={Genres} />
           <Route exact path="/genres/new" component={NewGenre} />
           <Route exact path="/genres/:id" component={EditGenre} />
+          <Route exact path="/series" component={Series} />
+          <Route exact path="/series/new" component={NewSerie} />
+          <Route exact path="/series/:id" component={InfoSerie} />
         </Switch>
       </div>
     </Router>

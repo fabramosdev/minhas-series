@@ -2,23 +2,23 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-const Genres = () => {
+const Series = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    axios.get("/api/genres").then((res) => {
+    axios.get("/api/series").then((res) => {
       setData(res.data.data);
     });
   }, []);
 
-  const deleteGenre = (id) => {
-    axios.delete(`/api/genres/${id}`).then((res) => {
+  const deleteSerie = (id) => {
+    axios.delete(`/api/series/${id}`).then((res) => {
       const dataFilter = data.filter((item) => item.id !== id);
       setData(dataFilter);
     });
   };
 
-  const renderGenres = (record) => {
+  const renderSeries = (record) => {
     return (
       <tr key={record.id}>
         <th scope="row">{record.id}</th>
@@ -26,12 +26,12 @@ const Genres = () => {
         <td>
           <button
             className="btn btn-danger"
-            onClick={() => deleteGenre(record.id)}
+            onClick={() => deleteSerie(record.id)}
           >
             Deletar
           </button>
-          <Link to={`/genres/${record.id}`} className="btn btn-warning">
-            Editar
+          <Link to={`/series/${record.id}`} className="btn btn-warning">
+            Info
           </Link>
         </td>
       </tr>
@@ -42,7 +42,7 @@ const Genres = () => {
     return (
       <div className="container">
         <div className="alert alert-secondary" role="alert">
-          Nao ha generos cadastrados no momento...
+          Nao ha series cadastradas no momento...
         </div>
         <Link to="/series/new" className="btn btn-primary">
           Nova série
@@ -53,9 +53,9 @@ const Genres = () => {
 
   return (
     <div className="container">
-      <h1>Generos</h1>
-      <Link to="/genres/new" className="btn btn-primary">
-        Novo genero
+      <h1>Series</h1>
+      <Link to="/series/new" className="btn btn-primary">
+        Nova série
       </Link>
       <br />
       <br />
@@ -67,10 +67,10 @@ const Genres = () => {
             <th scope="col">Actions</th>
           </tr>
         </thead>
-        <tbody>{data.map(renderGenres)}</tbody>
+        <tbody>{data.map(renderSeries)}</tbody>
       </table>
     </div>
   );
 };
 
-export default Genres;
+export default Series;

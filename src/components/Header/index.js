@@ -16,22 +16,29 @@ const Header = () => {
     setOpen(!open);
   };
   return (
-    <Navbar color="light" light expand="md">
-      <NavbarBrand tag={Link} to="/">
-        Minhas Series
-      </NavbarBrand>
+    <div className="container">
+      <Navbar color="light" light expand="md">
+        <NavbarBrand tag={Link} to="/">
+          Minhas Series
+        </NavbarBrand>
 
-      <NavbarToggler onClick={toggleMenu} />
-      <Collapse isOpen={open} navbar>
-        <Nav className="ml-auto" navbar>
-          <NavItem>
-            <NavLink tag={Link} to="/genres">
-              Generos
-            </NavLink>
-          </NavItem>
-        </Nav>
-      </Collapse>
-    </Navbar>
+        <NavbarToggler onClick={toggleMenu} />
+        <Collapse isOpen={open} navbar>
+          <Nav className="ml-auto" navbar>
+            <NavItem>
+              <NavLink tag={Link} to="/series">
+                Séries
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink tag={Link} to="/genres">
+                Generos
+              </NavLink>
+            </NavItem>
+          </Nav>
+        </Collapse>
+      </Navbar>
+    </div>
   );
 };
 
