@@ -4,12 +4,13 @@ import { Redirect } from "react-router-dom";
 import { Badge } from "reactstrap";
 
 const InfoSerie = ({ match }) => {
-  const [form, setForm] = useState({});
+  const [form, setForm] = useState({ name: '' });
   const [success, setSuccess] = useState(false);
   const [mode, setMode] = useState("INFO");
   const [genres, setGenres] = useState([]);
-  const [data, setData] = useState({});
+  const [genreId, setGenreId] = useState('');
 
+  const [data, setData] = useState({});
   useEffect(() => {
     const id = match.params.id;
     axios.get(`/api/series/${id}`).then((res) => {
@@ -21,8 +22,14 @@ const InfoSerie = ({ match }) => {
   useEffect(() => {
     axios.get("/api/genres").then((res) => {
       setGenres(res.data.data);
+      const genres = res.data.data;
+      const found = genres.find(value => data.genre === value.name)
+      
+      if(found){
+        setGenreId(found.id)
+      }
     });
-  }, []);
+  }, [data, form]);
 
   const masterHeader = {
     height: "50vh",
@@ -32,6 +39,10 @@ const InfoSerie = ({ match }) => {
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
   };
+
+  const onChangeGenre = evt => {
+    setGenreId(evt.target.value)
+  }
 
   const onChange = (field) => (evt) => {
     setForm({
@@ -48,7 +59,10 @@ const InfoSerie = ({ match }) => {
   };
 
   const saveSerie = () => {
-    axios.put(`/api/series/${match.params.id}`, form).then((res) => {
+    axios.put(`/api/series/${match.params.id}`, { 
+      ...form,
+      genre_id: genreId
+    }).then((res) => {
       setSuccess(true);
     });
   };
@@ -73,8 +87,8 @@ const InfoSerie = ({ match }) => {
               <div className="col-8">
                 <h1 className="font-weight-light text-white">{data.name}</h1>
                 <div className="lead text-white">
-                  <Badge color="success">Assistido</Badge>
-                  <Badge color="warning">Assistir</Badge>
+                  { data.status === 'ASSISTIDO' && <Badge color="success">Assistido</Badge> }
+                  { data.status === 'PARA_ASSISTIR' && <Badge color="warning">Assistir</Badge>}
                   Genero: {data.genre}
                 </div>
               </div>
@@ -82,7 +96,7 @@ const InfoSerie = ({ match }) => {
           </div>
         </div>
       </header>
-      <div>
+      <div className="container">
         <button onClick={() => setMode("EDIT")} className="btn btn-primary">
           Editar
         </button>
@@ -90,7 +104,6 @@ const InfoSerie = ({ match }) => {
       {mode === "EDIT" && (
         <div className="container">
           <h1>Editar</h1>
-          {JSON.stringify(form)}
           <button onClick={() => setMode("INFO")} className="btn btn-primary">
             Cancelar edicao
           </button>
@@ -118,13 +131,12 @@ const InfoSerie = ({ match }) => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="name">Generos</label>
-              <select className="form-control" onChange={onChange("genre_id")}>
+              <label htmlFor="name">Gênero</label>
+              <select className="form-control" onChange={onChangeGenre} value={genreId}>
                 {genres.map((genre) => (
                   <option
                     key={genre.id}
                     value={genre.id}
-                    selected={genre.id === form.genre}
                   >
                     {genre.name}
                   </option>
@@ -138,7 +150,8 @@ const InfoSerie = ({ match }) => {
                 name="status"
                 id="assistido"
                 value="ASSISTIDO"
-                onClick={selectStatus("ASSISTIDO")}
+                onChange={selectStatus("ASSISTIDO")}
+                checked={form.status === 'ASSISTIDO'}
               />
               <label htmlFor="assistido" className="form-check-label">
                 Assistido
@@ -151,7 +164,9 @@ const InfoSerie = ({ match }) => {
                 name="status"
                 id="paraAssistir"
                 value="PARA_ASSISTIR"
-                onClick={selectStatus("PARA_ASSISTIR")}
+                onChange={selectStatus("PARA_ASSISTIR")}
+                checked={form.status === 'PARA_ASSISTIR'}
+
               />
               <label htmlFor="paraAssistir" className="form-check-label">
                 Para assistir
